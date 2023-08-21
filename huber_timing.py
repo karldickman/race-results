@@ -35,7 +35,10 @@ def parse(content: str) -> DataFrame:
     return DataFrame(data = data)
 
 if __name__ == "__main__":
-    url = "https://www.hubertiming.com/results/2022Flat"
-    content = fetch(url)
-    data = parse(content)
-    print(data)
+    with open("huber_timing.txt", "r") as url_file:
+        urls = [url.strip() for url in url_file.readlines()]
+    for url in urls:
+        content = fetch(url)
+        data = parse(content)
+        print(url)
+        print(data)
