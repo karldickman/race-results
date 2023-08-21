@@ -35,6 +35,9 @@ def save_facsimile(url: str) -> None:
 def parse(content: str) -> DataFrame:
     soup = BeautifulSoup(content, features = "lxml")
     table = soup.find(id = "individualResults")
+    if table is None:
+        print("Error: could not find #individualResults table")
+        return
     table_head = table.find("thead")
     columns = table_head.find_all("th")
     columns = [column.text.strip() for column in columns]
@@ -60,4 +63,5 @@ if __name__ == "__main__":
         content = fetch(url)
         data = parse(content)
         print(url)
-        print(data)
+        if not data is None:
+            print(data)
