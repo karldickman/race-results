@@ -32,6 +32,19 @@ def save_facsimile(url: str) -> None:
     if not path.isfile(facsimile_path):
         pdfkit.from_url(url, facsimile_path, { "orientation": "Landscape" })
 
+def get_linked_results(content: str) -> list[str]:
+    soup = BeautifulSoup(content, features = "lxml")
+    navigation_containers = soup.find_all("div", { "class": "text-center" })
+    for navigation_container in navigation_containers:
+        buttons = navigation_container.find_all("a", { "role": "button" })
+        for button in buttons:
+            href: str = button["href"]
+            if any(map(lambda frag: href.startswith(f"/results/{frag}"), ["2016", "feed", "gallery", "team", "summary"])):
+                continue
+            if "virtual" in href.lower() or "walk" in href.lower():
+                continue
+            yield "https://www.hubertiming.com" + button["href"]
+
 def parse(content: str) -> DataFrame:
     soup = BeautifulSoup(content, features = "lxml")
     table = soup.find(id = "individualResults")
@@ -65,3 +78,5 @@ if __name__ == "__main__":
         print(url)
         if not data is None:
             print(data)
+        #for linked_url in get_linked_results(content):
+        #    print(linked_url)
