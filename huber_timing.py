@@ -1,14 +1,22 @@
-from os import path
+from os import mkdir, path
 
 from bs4 import BeautifulSoup
 from pandas import DataFrame
+import pdfkit
 import requests
 
-def fetch(url: str) -> str:
-    cached_file_path = url
+DOWNLOADS = "download-cache"
+FACSIMILES = "facsimiles"
+
+def safe_file_name(url: str, extension: str) -> str:
+    file_name = url
     for chr in ["<", ">", ":", "\"", "/", "\\", "|", "?"]:
-        cached_file_path = cached_file_path.replace(chr, "_")
-    cached_file_path = path.join("download-cache", cached_file_path)
+        file_name = file_name.replace(chr, "_")
+    return file_name + "." + extension
+
+def fetch(url: str) -> str:
+    cached_file_name = safe_file_name(url, "html")
+    cached_file_path = path.join(DOWNLOADS, cached_file_name)
     if path.isfile(cached_file_path):
         with open(cached_file_path, "r") as cached_file:
             return cached_file.read()
@@ -17,6 +25,12 @@ def fetch(url: str) -> str:
     with open(cached_file_path, "w") as cached_file:
         cached_file.write(content)
     return content
+
+def save_facsimile(url: str) -> None:
+    file_name = safe_file_name(url, "pdf")
+    facsimile_path = path.join(FACSIMILES, file_name)
+    if not path.isfile(facsimile_path):
+        pdfkit.from_url(url, facsimile_path, { "orientation": "Landscape" })
 
 def parse(content: str) -> DataFrame:
     soup = BeautifulSoup(content, features = "lxml")
@@ -35,9 +49,14 @@ def parse(content: str) -> DataFrame:
     return DataFrame(data = data)
 
 if __name__ == "__main__":
+    if not path.exists(DOWNLOADS):
+        mkdir(DOWNLOADS)
+    if not path.exists(FACSIMILES):
+        mkdir(FACSIMILES)
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
     for url in urls:
+        save_facsimile(url)
         content = fetch(url)
         data = parse(content)
         print(url)
