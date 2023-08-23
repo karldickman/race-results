@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+from itertools import groupby
+from operator import itemgetter
 from os import mkdir, path
+from typing import Callable
 
 from bs4 import BeautifulSoup
 from pandas import DataFrame
@@ -76,11 +79,10 @@ if __name__ == "__main__":
         mkdir(FACSIMILES)
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
-    for url in urls:
-        content = download_race_results(url)
-        data = parse(content)
-        print(url)
-        if not data is None:
-            print(data)
-        #for linked_url in get_linked_results(content):
-        #    print(linked_url)
+    race_results = [parse(download_race_results(url)) for url in urls]
+    race_results = filter(lambda df: df is not None, race_results)
+    column_headers: Callable[[DataFrame], str] = lambda df: ", ".join(df.columns)
+    grouped_by_columns = groupby(sorted(race_results, key = column_headers), column_headers)
+    count_by_columns = [(columns, len(list(races))) for columns, races in grouped_by_columns]
+    for columns, count in sorted(count_by_columns, key = itemgetter(1)):
+        print(count, columns)
