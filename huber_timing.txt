@@ -130,7 +130,6 @@ https://www.hubertiming.com/results/2017WorstDay
 https://www.hubertiming.com/results/2017Y2K
 https://www.hubertiming.com/results/2017Y2KHalf
 https://www.hubertiming.com/results/2017Zero
-https://www.hubertiming.com/results/2017Zero1Mile
 https://www.hubertiming.com/results/2018Aurora
 https://www.hubertiming.com/results/2018Aurora1K
 https://www.hubertiming.com/results/2018AutumnLeaves
@@ -194,7 +193,6 @@ https://www.hubertiming.com/results/2018OperationJack
 https://www.hubertiming.com/results/2018OperationJackHalf
 https://www.hubertiming.com/results/2018OperationJackMarathon
 https://www.hubertiming.com/results/2018OSM
-https://www.hubertiming.com/results/2018OTG
 https://www.hubertiming.com/results/2018Resolution
 https://www.hubertiming.com/results/2018Resolution2Person
 https://www.hubertiming.com/results/2018Resolution3Person
@@ -290,7 +288,6 @@ https://www.hubertiming.com/results/2019Champoeg
 https://www.hubertiming.com/results/2019Champoeg30K
 https://www.hubertiming.com/results/2019ChampoegHalf
 https://www.hubertiming.com/results/2019ChampoegRelay
-https://www.hubertiming.com/results/2019Cinco
 https://www.hubertiming.com/results/2019Columbia
 https://www.hubertiming.com/results/2019CookPark
 https://www.hubertiming.com/results/2019CookParkHalf
@@ -671,15 +668,12 @@ https://www.hubertiming.com/results/2022NoPo3000
 https://www.hubertiming.com/results/2022NoPo400
 https://www.hubertiming.com/results/2022NoPo800
 https://www.hubertiming.com/results/2022NoPoWomens
-https://www.hubertiming.com/results/2022ORRC
-https://www.hubertiming.com/results/2022OTG
 https://www.hubertiming.com/results/2022PILFernhill1
 https://www.hubertiming.com/results/2022PILFernhill1BJV
 https://www.hubertiming.com/results/2022PILFernhill1GJV
 https://www.hubertiming.com/results/2022PILFernhill1GVAR
 https://www.hubertiming.com/results/2022PLH
 https://www.hubertiming.com/results/2022PLH3K
-https://www.hubertiming.com/results/2022Resolution
 https://www.hubertiming.com/results/2022Runtoberfest
 https://www.hubertiming.com/results/2022RuntoberfestMile
 https://www.hubertiming.com/results/2022SalemFreeClinics
@@ -724,7 +718,6 @@ https://www.hubertiming.com/results/2023Bristow6Hour
 https://www.hubertiming.com/results/2023Champoeg
 https://www.hubertiming.com/results/2023Champoeg30K
 https://www.hubertiming.com/results/2023ChampoegHalf
-https://www.hubertiming.com/results/2023CSC
 https://www.hubertiming.com/results/2023FBFW
 https://www.hubertiming.com/results/2023FBFW5K
 https://www.hubertiming.com/results/2023FBFWQuarter
