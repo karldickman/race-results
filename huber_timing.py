@@ -8,6 +8,7 @@ import requests
 
 DOWNLOADS = "download-cache"
 FACSIMILES = "facsimiles"
+OUT = "out"
 
 def safe_file_name(url: str, extension: str) -> str:
     file_name = url
@@ -70,13 +71,13 @@ def parse(content: str) -> DataFrame:
     return DataFrame(data = data)
 
 if __name__ == "__main__":
-    if not path.exists(DOWNLOADS):
-        mkdir(DOWNLOADS)
-    if not path.exists(FACSIMILES):
-        mkdir(FACSIMILES)
+    for dir in [DOWNLOADS, FACSIMILES, OUT]:
+        if not path.exists(dir):
+            mkdir(dir)
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
     race_results = [parse(download_race_results(url)) for url in urls]
     race_results = filter(lambda df: df is not None, race_results)
     all_race_results = concat(race_results)
+    all_race_results.to_csv("out/huber_timing.csv")
     print(all_race_results)
