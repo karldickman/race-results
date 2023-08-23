@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-from itertools import groupby
-from operator import itemgetter
 from os import mkdir, path
-from typing import Callable
 
 from bs4 import BeautifulSoup
-from pandas import DataFrame
+from pandas import concat, DataFrame
 import pdfkit
 import requests
 
@@ -81,8 +78,5 @@ if __name__ == "__main__":
         urls = [url.strip() for url in url_file.readlines()]
     race_results = [parse(download_race_results(url)) for url in urls]
     race_results = filter(lambda df: df is not None, race_results)
-    column_headers: Callable[[DataFrame], str] = lambda df: ", ".join(df.columns)
-    grouped_by_columns = groupby(sorted(race_results, key = column_headers), column_headers)
-    count_by_columns = [(columns, len(list(races))) for columns, races in grouped_by_columns]
-    for columns, count in sorted(count_by_columns, key = itemgetter(1)):
-        print(count, columns)
+    all_race_results = concat(race_results)
+    print(all_race_results)
