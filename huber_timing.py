@@ -33,6 +33,10 @@ def save_facsimile(url: str) -> None:
     if not path.isfile(facsimile_path):
         pdfkit.from_url(url, facsimile_path, { "orientation": "Landscape" })
 
+def download_race_results(url: str) -> str:
+    save_facsimile(url)
+    return fetch(url)
+
 def get_linked_results(content: str) -> list[str]:
     soup = BeautifulSoup(content, features = "lxml")
     navigation_containers = soup.find_all("div", { "class": "text-center" })
@@ -73,8 +77,7 @@ if __name__ == "__main__":
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
     for url in urls:
-        save_facsimile(url)
-        content = fetch(url)
+        content = download_race_results(url)
         data = parse(content)
         print(url)
         if not data is None:
