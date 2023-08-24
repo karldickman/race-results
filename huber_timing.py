@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from operator import itemgetter
 from os import mkdir, path
 
 from bs4 import BeautifulSoup
@@ -51,8 +52,9 @@ def get_linked_results(content: str) -> list[str]:
                 continue
             yield "https://www.hubertiming.com" + button["href"]
 
-def parse(content: str) -> DataFrame:
+def parse(content: str) -> (tuple[DataFrame, DataFrame] | None):
     soup = BeautifulSoup(content, features = "lxml")
+    # Race results
     table = soup.find(id = "individualResults")
     if table is None:
         print("Error: could not find #individualResults table")
@@ -62,13 +64,27 @@ def parse(content: str) -> DataFrame:
     columns = [column.text.strip() for column in columns]
     data: dict[str, list[str]] = dict(zip(columns, [[] for _ in columns]))
     table_body = table.find("tbody")
-    rows = table_body.find_all("tr")
+    rows = list(table_body.find_all("tr"))
     for row in rows:
         cells = row.find_all("td")
         cells = [cell.text.strip() for cell in cells]
         for column, cell in zip(columns, cells):
             data[column].append(cell)
-    return DataFrame(data = data)
+    # Race metadata
+    metadata_strings = tuple(soup.find("big").stripped_strings)
+    name = metadata_strings[0]
+    location = metadata_strings[1]
+    date = metadata_strings[2]
+    host = metadata_strings[3] if len(metadata_strings) > 3 else None
+    data["Race"] = [name for _ in rows]
+    metadata = DataFrame(data = {
+        "Race": [name],
+        "Location": [location],
+        "Date": [date],
+        "Host": [host],
+    })
+    results = DataFrame(data = data)
+    return metadata, results
 
 if __name__ == "__main__":
     for dir in [DOWNLOADS, FACSIMILES, OUT]:
@@ -76,9 +92,10 @@ if __name__ == "__main__":
             mkdir(dir)
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
-    race_results = [parse(download_race_results(url)) for url in urls]
-    race_results = filter(lambda df: df is not None, race_results)
-    all_race_results = concat(race_results).loc[:, [
+    race_results = (parse(download_race_results(url)) for url in urls)
+    race_results = list(filter(lambda df: df is not None, race_results))
+    all_races = concat(map(itemgetter(0), race_results))
+    all_race_results = concat(map(itemgetter(1), race_results)).loc[:, [
         "Place",
         "Bib",
         "Name",
@@ -91,5 +108,6 @@ if __name__ == "__main__":
         "Time",
         "Distance"
     ]]
-    all_race_results.to_csv("out/huber_timing.csv")
-    print(all_race_results)
+    all_races.to_csv("out/huber_timing_races.csv")
+    all_race_results.to_csv("out/huber_timing_results.csv")
+    print(all_races)
