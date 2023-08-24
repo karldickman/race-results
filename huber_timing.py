@@ -78,6 +78,18 @@ if __name__ == "__main__":
         urls = [url.strip() for url in url_file.readlines()]
     race_results = [parse(download_race_results(url)) for url in urls]
     race_results = filter(lambda df: df is not None, race_results)
-    all_race_results = concat(race_results)
+    all_race_results = concat(race_results).loc[:, [
+        "Place",
+        "Bib",
+        "Name",
+        "Gender",
+        "Age",
+        "City",
+        "State",
+        "Time to Start",
+        "Gun Time",
+        "Time",
+        "Distance"
+    ]]
     all_race_results.to_csv("out/huber_timing.csv")
     print(all_race_results)
