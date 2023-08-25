@@ -52,7 +52,7 @@ def get_linked_results(content: str) -> list[str]:
                 continue
             yield "https://www.hubertiming.com" + button["href"]
 
-def parse(url: str, content: str) -> tuple[DataFrame, DataFrame]:
+def parse(url: str, content: str) -> tuple[dict[str, str | None], DataFrame]:
     soup = BeautifulSoup(content, features = "lxml")
     # Race results
     table = soup.find(id = "individualResults")
@@ -76,13 +76,13 @@ def parse(url: str, content: str) -> tuple[DataFrame, DataFrame]:
     date = metadata_strings[2]
     host = metadata_strings[3] if len(metadata_strings) > 3 else None
     data["Race"] = [name for _ in rows]
-    metadata = DataFrame(data = {
-        "Race": [name],
-        "Location": [location],
-        "Date": [date],
-        "Host": [host],
-        "URL": [url],
-    })
+    metadata: dict[str, str | None] = {
+        "Race": name,
+        "Location": location,
+        "Date": date,
+        "Host": host,
+        "URL": url,
+    }
     results = DataFrame(data = data)
     return metadata, results
 
@@ -93,7 +93,18 @@ if __name__ == "__main__":
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
     race_results = [parse(url, download_race_results(url)) for url in urls]
-    all_races = concat(map(itemgetter(0), race_results))
+    race_results = [(race, results) for (race, results) in race_results if race["Location"] != "Virtual"]
+    all_races_data = {
+        "Race": [],
+        "Location": [],
+        "Date": [],
+        "Host": [],
+        "URL": [],
+    }
+    for race_metadata, _ in race_results:
+        for property in all_races_data:
+            all_races_data[property].append(race_metadata[property])
+    all_races = DataFrame(data = all_races_data)
     all_race_results = concat(map(itemgetter(1), race_results)).loc[:, [
         "Place",
         "Bib",
