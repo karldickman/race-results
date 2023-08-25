@@ -107,6 +107,11 @@ if __name__ == "__main__":
         "Time",
         "Distance"
     ]]
-    all_races.to_csv("out/huber_timing_races.csv")
-    all_race_results.to_csv("out/huber_timing_results.csv")
+    all_people = all_race_results[["Name", "Gender"]] \
+        .drop_duplicates(subset = ["Name", "Gender"]) \
+        .sort_values(by = ["Name"])
+    # Write results
+    all_races.to_csv(path.join(OUT, "huber_timing_races.csv"))
+    all_race_results.to_csv(path.join(OUT, "huber_timing_results.csv"))
+    all_people.to_csv(path.join(OUT, "huber_timing_people.csv"))
     print(all_races)
