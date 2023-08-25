@@ -52,13 +52,12 @@ def get_linked_results(content: str) -> list[str]:
                 continue
             yield "https://www.hubertiming.com" + button["href"]
 
-def parse(url: str, content: str) -> (tuple[DataFrame, DataFrame] | None):
+def parse(url: str, content: str) -> tuple[DataFrame, DataFrame]:
     soup = BeautifulSoup(content, features = "lxml")
     # Race results
     table = soup.find(id = "individualResults")
     if table is None:
-        print("Error: could not find #individualResults table")
-        return
+        raise Exception("Error: could not find #individualResults table")
     table_head = table.find("thead")
     columns = table_head.find_all("th")
     columns = [column.text.strip() for column in columns]
@@ -93,8 +92,7 @@ if __name__ == "__main__":
             mkdir(dir)
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
-    race_results = (parse(url, download_race_results(url)) for url in urls)
-    race_results = list(filter(lambda df: df is not None, race_results))
+    race_results = [parse(url, download_race_results(url)) for url in urls]
     all_races = concat(map(itemgetter(0), race_results))
     all_race_results = concat(map(itemgetter(1), race_results)).loc[:, [
         "Place",
