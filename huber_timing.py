@@ -62,6 +62,7 @@ def parse(url: str, content: str) -> tuple[dict[str, str | None], DataFrame]:
     columns = table_head.find_all("th")
     columns = [column.text.strip() for column in columns]
     data: dict[str, list[str]] = dict(zip(columns, [[] for _ in columns]))
+    data["URL"] = []
     table_body = table.find("tbody")
     rows = list(table_body.find_all("tr"))
     for row in rows:
@@ -69,6 +70,7 @@ def parse(url: str, content: str) -> tuple[dict[str, str | None], DataFrame]:
         cells = [cell.text.strip() for cell in cells]
         for column, cell in zip(columns, cells):
             data[column].append(cell)
+        data["URL"].append(url)
     # Race metadata
     metadata_strings = tuple(soup.find("big").stripped_strings)
     name = metadata_strings[0]
@@ -116,7 +118,8 @@ if __name__ == "__main__":
         "Time to Start",
         "Gun Time",
         "Time",
-        "Distance"
+        "Distance",
+        "URL",
     ]]
     all_people = all_race_results[["Name"]] \
         .drop_duplicates(subset = ["Name"]) \
