@@ -3,6 +3,7 @@ from operator import itemgetter
 from os import mkdir, path
 
 from bs4 import BeautifulSoup
+from dateutil.parser import parse as parse_date
 from pandas import concat, DataFrame
 import pdfkit
 import requests
@@ -75,13 +76,13 @@ def parse(url: str, content: str) -> tuple[dict[str, str | None], DataFrame]:
     metadata_strings = tuple(soup.find("big").stripped_strings)
     name = metadata_strings[0]
     location = metadata_strings[1]
-    date = metadata_strings[2]
+    date_strings = list(map(lambda string: string.strip(), metadata_strings[2].split("-")))
     host = metadata_strings[3] if len(metadata_strings) > 3 else None
     data["Race"] = [name for _ in rows]
-    metadata: dict[str, str | None] = {
+    metadata = {
         "Race": name,
         "Location": location,
-        "Date": date,
+        "Date": parse_date(date_strings[0]) if len(date_strings) == 1 else list(map(parse_date, date_strings)),
         "Host": host,
         "URL": url,
     }
