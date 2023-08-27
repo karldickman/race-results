@@ -30,7 +30,7 @@ def download_race_results(url: str):
     if page >= 80:
         print(f"Stopped loading {url} at 80 pages")
 
-def fetch_race_urls(slug: str):
+def fetch_race_urls_and_metadata(slug: str):
     response = json.loads(fetch(f"https://api.enmotive.grepcv.com/prod/events/{slug}", "json"))
     if response["error"] != {}:
         print("Error retrieving URLs for", slug)
@@ -44,7 +44,17 @@ def fetch_race_urls(slug: str):
             if bracket["name"] != "Overall":
                 continue
             url = race_url(race_metadata["id"], bracket["id"])
-            yield url
+            yield {
+                "event_name": race_metadata["name"],
+                "event_type": race_metadata["type"],
+                "date": race_metadata["date"]["start"],
+                "end_date": race_metadata["date"]["end"] if race_metadata["date"]["end"] != race_metadata["date"]["start"] else None,
+                "race": category["name"],
+                "venue": race_metadata["location"]["name"],
+                "city": race_metadata["location"]["city"],
+                "state": race_metadata["location"]["state"],
+                "url": url,
+            }
 
 def race_url(event_id: str, race_id: str) -> str:
     return f"https://api.enmotive.grepcv.com/prod/events/{event_id}/leaderboards?bracket_id={race_id}"
@@ -62,14 +72,30 @@ def results_to_data_frame(url: str, results: list[dict]) -> DataFrame:
 def main(slugs_file_path: str) -> None:
     with open(slugs_file_path, "r") as slug_file:
         slugs = [slug.strip() for slug in slug_file.readlines()]
-    urls = flatten(map(fetch_race_urls, slugs))
+    entries = flatten(map(fetch_race_urls_and_metadata, slugs))
     data_frame_each_race = []
-    for url in urls:
+    race_metadata = {
+        "event_name": [],
+        "event_type": [],
+        "date": [],
+        "end_date": [],
+        "race": [],
+        "venue": [],
+        "city": [],
+        "state": [],
+        "url": [],
+    }
+    for entry in entries:
+        for key in race_metadata:
+            race_metadata[key].append(entry[key])
+        url = entry["url"]
         race_results = list(download_race_results(url))
         race_results_data_frame = results_to_data_frame(url, race_results)
         data_frame_each_race.append(race_results_data_frame)
-    all_races = concat(data_frame_each_race)
-    all_races.to_csv(path.join(OUT, "enmotive_results.csv"))
+    all_races = DataFrame(data = race_metadata)
+    all_races.to_csv(path.join(OUT, "enmotive_races.csv"))
+    all_race_results = concat(data_frame_each_race)
+    all_race_results.to_csv(path.join(OUT, "enmotive_results.csv"))
     print(all_races)
 
 if __name__ == "__main__":
