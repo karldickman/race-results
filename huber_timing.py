@@ -82,7 +82,8 @@ def parse(url: str, content: str) -> tuple[dict[str, str | None], DataFrame]:
     metadata = {
         "Race": name,
         "Location": location,
-        "Date": parse_date(date_strings[0]) if len(date_strings) == 1 else list(map(parse_date, date_strings)),
+        "Date": parse_date(date_strings[0]),
+        "End Date": parse_date(date_strings[1]) if len(date_strings) > 1 else None,
         "Host": host,
         "URL": url,
     }
