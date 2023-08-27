@@ -9,10 +9,12 @@ def safe_file_name(url: str, extension: str) -> str:
     file_name = url
     for chr in ["<", ">", ":", "\"", "/", "\\", "|", "?"]:
         file_name = file_name.replace(chr, "_")
-    return file_name + "." + extension
+    if extension is not None:
+        file_name = file_name + "." + extension
+    return file_name
 
-def fetch(url: str) -> str:
-    cached_file_name = safe_file_name(url, "html")
+def fetch(url: str, extension: str) -> str:
+    cached_file_name = safe_file_name(url, extension)
     cached_file_path = path.join(DOWNLOADS, cached_file_name)
     if path.isfile(cached_file_path):
         with open(cached_file_path, "r") as cached_file:
@@ -31,4 +33,4 @@ def save_facsimile(url: str) -> None:
 
 def download_race_results(url: str) -> str:
     save_facsimile(url)
-    return fetch(url)
+    return fetch(url, "html")
