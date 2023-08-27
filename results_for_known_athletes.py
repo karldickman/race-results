@@ -4,11 +4,7 @@ from os import path
 
 from pandas import isnull, read_csv
 
-IN = "in"
-OUT = "out"
-
-def has_active_affiliation(row) -> bool:
-    return True
+from directories import IN, OUT
 
 if __name__ == "__main__":
     # Associate athlete names with their club memberships

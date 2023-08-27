@@ -5,8 +5,7 @@ from os import path
 from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance
 from pandas import DataFrame, read_csv
 
-IN = "in"
-OUT = "out"
+from directories import IN, OUT
 
 if __name__ == "__main__":
     athletes: list[str] = list(read_csv(path.join(IN, "athletes.csv"))["Athlete"])

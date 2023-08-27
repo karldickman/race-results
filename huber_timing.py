@@ -1,44 +1,13 @@
 #!/usr/bin/env python
 from operator import itemgetter
-from os import mkdir, path
+from os import path
 
 from bs4 import BeautifulSoup
 from dateutil.parser import parse as parse_date
 from pandas import concat, DataFrame
-import pdfkit
-import requests
 
-DOWNLOADS = "download-cache"
-FACSIMILES = "facsimiles"
-OUT = "out"
-
-def safe_file_name(url: str, extension: str) -> str:
-    file_name = url
-    for chr in ["<", ">", ":", "\"", "/", "\\", "|", "?"]:
-        file_name = file_name.replace(chr, "_")
-    return file_name + "." + extension
-
-def fetch(url: str) -> str:
-    cached_file_name = safe_file_name(url, "html")
-    cached_file_path = path.join(DOWNLOADS, cached_file_name)
-    if path.isfile(cached_file_path):
-        with open(cached_file_path, "r") as cached_file:
-            return cached_file.read()
-    result = requests.get(url)
-    content = result.text
-    with open(cached_file_path, "w") as cached_file:
-        cached_file.write(content)
-    return content
-
-def save_facsimile(url: str) -> None:
-    file_name = safe_file_name(url, "pdf")
-    facsimile_path = path.join(FACSIMILES, file_name)
-    if not path.isfile(facsimile_path):
-        pdfkit.from_url(url, facsimile_path, { "orientation": "Landscape" })
-
-def download_race_results(url: str) -> str:
-    save_facsimile(url)
-    return fetch(url)
+from directories import OUT
+from download import download_race_results
 
 def get_linked_results(content: str) -> list[str]:
     soup = BeautifulSoup(content, features = "lxml")
@@ -91,9 +60,6 @@ def parse(url: str, content: str) -> tuple[dict[str, str | None], DataFrame]:
     return metadata, results
 
 if __name__ == "__main__":
-    for dir in [DOWNLOADS, FACSIMILES, OUT]:
-        if not path.exists(dir):
-            mkdir(dir)
     with open("huber_timing.txt", "r") as url_file:
         urls = [url.strip() for url in url_file.readlines()]
     race_results = [parse(url, download_race_results(url)) for url in urls]
