@@ -93,9 +93,14 @@ def main(slugs_file_path: str) -> None:
         race_results_data_frame = results_to_data_frame(url, race_results)
         data_frame_each_race.append(race_results_data_frame)
     all_races = DataFrame(data = race_metadata)
-    all_races.to_csv(path.join(OUT, "enmotive_races.csv"))
     all_race_results = concat(data_frame_each_race)
+    all_people = all_race_results[["name"]] \
+        .drop_duplicates(subset = ["name"]) \
+        .sort_values(by = ["name"])
+    # Write results to CSV
+    all_races.to_csv(path.join(OUT, "enmotive_races.csv"))
     all_race_results.to_csv(path.join(OUT, "enmotive_results.csv"))
+    all_people.to_csv(path.join(OUT, "enmotive_people.csv"))
     print(all_races)
 
 if __name__ == "__main__":
