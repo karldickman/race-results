@@ -2,6 +2,7 @@ from os import mkdir, path
 
 DOWNLOADS = "download-cache"
 FACSIMILES = "facsimiles"
+IN = "in"
 OUT = "out"
 
 if __name__ == "__main__":
